@@ -1,0 +1,12 @@
+dist
+.parcel-cache
+.npmignore
+.cache
+**/.eslintrc.js
+**/.eslintignore
+coverage
+**/.github/README.md
+**/index.html
+
+node_modules/
+dist/
