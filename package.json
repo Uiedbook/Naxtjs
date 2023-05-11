@@ -1,7 +1,7 @@
 {
-  "name": "naxt",
+  "name": "naxtjs",
   "version": "1.0.0",
-  "description": "server side rendering Web framework for building web apps and PWAs",
+  "description": "Naxtjs is a Cradova based framework for server side rendering",
   "main": "dist/index.js",
   "type": "module",
   "files": [
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FridayCandour/naxt.git"
+    "url": "git+https://github.com/Uiedbook/Naxtjs.git"
   },
   "scripts": {
     "build": "tsup lib/index.ts && npm run cp:typedef",

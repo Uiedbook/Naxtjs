@@ -1,7 +1,7 @@
 <br/>
 <p align="center">
   <a href="https://github.com/uiedbook/Naxtjs">
-    <img src="Naxtjs.png" alt="Logo" width="80" height="80">
+    <img src="naxt.png" alt="Logo" width="80" height="80">
   </a>
 
   <h1 align="center">Naxtjs</h1>
@@ -21,11 +21,9 @@
   </p>
 </p>
 
-![Contributors](https://img.shields.io/github/contributors/fridaycandour/Naxtjs?color=dark-green) ![Issues](https://img.shields.io/github/issues/fridaycandour/Naxtjs) ![License](https://img.shields.io/github/license/fridaycandour/Naxtjs)
-[![npm Version](https://img.shields.io/npm/v/Naxtjs.svg)](https://www.npmjs.com/package/Naxtjs)
-[![License](https://img.shields.io/npm/l/Naxtjs.svg)](https://github.com/Naxtjs/Naxtjs.js/blob/next/LICENSE)
-[![npm Downloads](https://img.shields.io/npm/dm/Naxtjs.svg)](https://www.npmjs.com/package/Naxtjs)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Naxtjs/Naxtjs.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/fridaycandour/Naxtjs?style=social) ![Stargazers](https://img.shields.io/github/stars/fridaycandour/Naxtjs?style=social)
+![Contributors](https://img.shields.io/github/contributors/Uiedbook/Naxtjs?color=dark-green) ![Issues](https://img.shields.io/github/issues/Uiedbook/Naxtjs) ![License](https://img.shields.io/github/license/Uiedbook/Naxtjs)
+[![npm Version](https://img.shields.io/npm/v/Naxtjs.svg)](https://www.npmjs.com/package/Naxtjs)[![npm Downloads](https://img.shields.io/npm/dm/Naxtjs.svg)](https://www.npmjs.com/package/Naxtjs)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/uiedbook/Naxtjs.js/blob/next/contributing.md)![Forks](https://img.shields.io/github/forks/uiedbook/Naxtjs?style=social) ![Stargazers](https://img.shields.io/github/stars/uiedbook/Naxtjs?style=social)
 
 # Contents
 
@@ -35,13 +33,12 @@
 - [Examples](#examples)
 - [Documentation](#documentation)
 - [Getting Help](#getting-help)
-- [Contributing](#contributing)
 
 ## What is Naxtjs?
 
     Naxtjs is a Cradova based framework for server side rendering.
 
-Naxt is the ultra fast, and performant, ssr framework for javascript and typescript.
+Naxt is an ultra fast, and performant, ssr framework for javascript and typescript.
 
 Naxtjs follows the [VJS specification](https://github.com/uiedbook/Naxtjs/blob/main/spec.md)
 
@@ -124,8 +121,6 @@ const h = async function () {
         {
           className: "App-link",
           href: "/",
-          target: "_blank",
-          rel: "noopener noreferrer",
           onclick() {
             console.log("hello people of the world");
           },
@@ -139,26 +134,6 @@ const h = async function () {
       padding: 0;
       margin: 0;
     }
-    .App {
-  text-align: center;
-}
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-.App-link {
-  color: #61dafb;
-}
     `)
   );
 };
@@ -168,59 +143,34 @@ const s = new Screen({
   template: h,
   persist: false,
 });
-Router.BrowserRoutes({ "/home/:user": s });
-Router.BrowserRoutes({ "/": s });
+Router.BrowserRoutes({
+   "/home/:user": s,
+   "/": s
+   // no html route
+   "/api": ()=>{
+    return JSON.stringify({foo:"bar"})
+   }
+   });
+
+   // if you want to use naxt basic server
 Router.listen({ debug: true });
+
+naxtjs basic server has
+
+file serving
+support for no html routes
+fast compilation
+and more
+
+
 
 // example visit http://127.0.0.1:3000/home/john
 ```
-
-### More info
-
----
-
-Naxtjs screens
-
----
-
-screens are rendered once by default to hack
-responsiveness making your app work fast as user navigates.
-
-this behavior can be override
-by passing
-persist: false
-in the constructor
-
-Naxtjs screens has
-onActivate() and
-onDeactivate() methods which is also available in the
-component function on the this variable bound to it.
-
-this allow you manage rendering
-circle for each screen in your app
 
 ## Documentation
 
 At the moment, we're in the process of creating a documentation website for Naxtjs, and we have limited resources. If you're interested in lending a hand, we invite you to join our community, gain firsthand experience, and contribute to the advancement of Naxtjs.
 
-## Getting Help
+## Getting Help and Contributing
 
-To get further insights and help on Naxtjs, visit our [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/Naxtjsframework) Community Chats.
-
-## Contributing
-
-We are currently working to [set](https://github.com/uiedbook/Naxtjs/blob/main/contributing.md) up the following:
-
-- building Naxtjs CLI (in progress)
-- Naxtjs Documentation Website
-- UI component libraries for Naxtjs
-- Sample projects
-- maintenance and promotion
-
-## Sponsor
-
-Your support is appreciated and needed to advance Naxtjs for more performance and improvements.
-
-Sponsorships can be done via [Patreon](https://www.patreon.com/FridayCandour) and [KO-FI](https://www.ko-fi.com/fridaycandour).
-
-Both monthly-recurring sponsorships and one-time donations are accepted.
+To get further insights and help on Naxtjs, visit our [Discord](https://discord.gg/b7fvMg38) and [Telegram](https://t.me/cradovaframework) Community Chats.
