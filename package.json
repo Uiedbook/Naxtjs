@@ -1,6 +1,6 @@
 {
   "name": "naxtjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Naxtjs is a Cradova based framework for server side rendering",
   "main": "dist/index.js",
   "type": "module",
