@@ -90,9 +90,11 @@ function Hello(name) {
   });
 }
 
-const html = compileHTML(div(Hello("peter"), Hello("joe")));
+const html = compileHTML(div(Hello("peter"), Hello("joe"))); // html string
 
-document.body.append(html);
+app.get("/", (req, res) => {
+  res.send(html);
+});
 ```
 
 ## A simple naxt app:
