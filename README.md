@@ -148,7 +148,7 @@ const s = new Screen({
 Router.BrowserRoutes({
    "/home/:user": s,
    "/": s
-   // no html route
+   // your none html route
    "/api": ()=>{
     return JSON.stringify({foo:"bar"})
    }
