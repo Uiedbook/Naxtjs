@@ -158,20 +158,19 @@ class naxtrouter {
    *
    * @param option
    */
-  async listen(option: { port?: number; debug?: boolean } = {}) {
-    option.port = 3000;
+  async listen(option: { port?: number; debug?: boolean } = { port: 3000 }) {
     const start_callback = () => {
       console.log("\x1B[32m Naxt Running on port " + option.port + " \x1B[39m");
     };
     const handler = async (req: any, res: any) => {
-      if (option.debug) {
-        const clientIP = req.connection.remoteAddress;
-        const connectUsing = req.connection.encrypted ? "SSL" : "HTTP";
-        console.log(
-          "Request received: " + connectUsing + " " + req.method + " " + req.url
-        );
-        console.log("Client IP: " + clientIP);
-      }
+      // if (option.debug) {
+      //   const clientIP = req.connection.remoteAddress;
+      //   const connectUsing = req.connection.encrypted ? "SSL" : "HTTP";
+      //   console.log(
+      //     "Request received: " + connectUsing + " " + req.method + " " + req.url
+      //   );
+      //   console.log("Client IP: " + clientIP);
+      // }
       res.writeHead(200, "OK", { "Content-Type": "text/html" });
       // send processed html
       if (req.url.includes(".")) {

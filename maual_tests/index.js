@@ -1,15 +1,15 @@
 import {
   div,
-  compile,
+  compileHTML,
   p,
-  serve,
   h1,
   button,
   script,
   style,
+  Router,
 } from "../dist/index.js";
 
-const HTML = compile(
+const HTML = compileHTML(
   false,
   div(
     script('console.log("hello world")'),
