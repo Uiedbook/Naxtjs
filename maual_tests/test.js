@@ -1,23 +1,3 @@
-//? ----> test passed
-
-// const a = new Promise((res) => {
-//   setTimeout(() => {
-//     res("pro");
-//   }, 100);
-// });
-// const b = async () => {
-//   setTimeout(() => {
-//     return "bro";
-//   }, 100);
-// };
-// const s = await a;
-// const y = await b();
-// console.log(s, y);
-// console.log("2");
-
-// const e = new Array(1000);
-// e.fill({ name: "hello world" });
-
 function benchSuit(code, runs = 1) {
   const st = Date.now();
   let i = 0;
@@ -44,39 +24,3 @@ function benchSuit(code, runs = 1) {
 //     i++;
 //   }
 // }, 1000);
-
-// benchSuit(() => {
-//   for (let i = 0; i < e.length; i++) {
-//     e[i] = null;
-//   }
-// }, 10);
-// benchSuit(() => {
-//   for (let i = 0; i < e.length; i++) {
-//     e[i] = null;
-//   }
-// }, 1000);
-
-// benchSuit(() => {
-//   let txx = "l|l";
-//   if (txx.includes("|")) {
-//     txx = "";
-//     //
-//   }
-// });
-// benchSuit(() => {
-//   let txx = "";
-//   if (txx.indexOf("|") > -1) {
-//     txx = "";
-//     //
-//   }
-// });
-
-const joinProps = (data) => {
-  let props = "";
-  for (const [k, v] of Object.entries(data)) {
-    props = props.concat(k + '="' + v + '" ');
-  }
-  return props;
-};
-
-console.log(joinProps({ a: 1, b: "boohoo" }));

@@ -1,16 +1,7 @@
-import {
-  div,
-  compileHTML,
-  p,
-  h1,
-  button,
-  script,
-  style,
-  Router,
-} from "../dist/index.js";
+import { div, compile, p, h1, button, script, style } from "../dist/index.js";
 
-const HTML = compileHTML(
-  false,
+const HTML = await compile(
+  "maual_tests/index.html",
   div(
     script('console.log("hello world")'),
     style("body {color: green;}"),
@@ -58,6 +49,6 @@ for (let i = 0; i < mountListeners.length; i++) {
 // console.log(mountListeners) 
 </script>`;
 
-await serve({ HTML: HTML[0], dependencies: [naxt_script] });
+// await serve({ HTML: HTML[0], dependencies: [naxt_script] });
 
 console.log(HTML);
