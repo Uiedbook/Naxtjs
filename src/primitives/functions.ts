@@ -39,12 +39,6 @@ export function Rhoda(l: any[]) {
   return fg;
 }
 
-export function css(identifier: string | TemplateStringsArray) {
-  if (Array.isArray(identifier)) {
-    identifier = identifier[0];
-  }
-  return identifier;
-}
 /**
  *
  * @param {expression} condition
@@ -214,7 +208,6 @@ function pile(dependency: Record<string, string> | false, element: any) {
     // children
     if (key == "children") {
       children.push(...element.children.map(pile.bind(undefined, dependency)));
-      // @ts-ignore
       element[key] = undefined;
       continue;
     }
@@ -233,15 +226,19 @@ export async function compile(file: string, Naxt_Element_Tree: any) {
   const HTML = pile(false, Naxt_Element_Tree);
   // the naxt script
   // TODO: adding reactivity via srrRef
+  //? comments
+  // hydration process = 1
+  // adding listeners = 2
+  // calling all onmount effects = 3
   const naxt_script = `<script>
-const naxt = {};
-naxt.fns = ${JSON.stringify(HTML[1])}
-// hydration process
-// adding listeners 
-for (const k in naxt.fns) {  
-  naxt.fns[k] = new Function('return '+naxt.fns[k]+'')()
-}
-// calling all onmount effects
+  // 1
+  const naxt = {};
+  naxt.fns = ${JSON.stringify(HTML[1])}
+  // 2
+  for (const k in naxt.fns) {  
+    naxt.fns[k] = new Function('return '+naxt.fns[k]+'')()
+  }
+  // 3
 const mountListeners = document.querySelectorAll('[data-mount-id]')
 for (let i = 0; i < mountListeners.length; i++) {
   const elem = mountListeners[i] 
@@ -252,7 +249,10 @@ for (let i = 0; i < mountListeners.length; i++) {
   let html: string | undefined = undefined;
   try {
     html = await readFile(file, "utf-8");
-    html = html.replace("{mount}", HTML[0] + "\n" + naxt_script);
+    html = html.replace(
+      "{mount}",
+      HTML[0] + (Object.keys(HTML[1]).length !== 0 ? "\n" + naxt_script : "")
+    );
   } catch (error) {
     if (String(error).includes(".html")) {
       throw new Error("naxt err: " + file + " not found");

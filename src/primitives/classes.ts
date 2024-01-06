@@ -1,16 +1,11 @@
 export class Element {
   [x: string]: Record<string, any>;
   children: any[] = [];
-  // @ts-ignore
-  nodeType: 2;
-  // @ts-ignore
-  tagName: string;
-  // @ts-ignore
-  style: Record<string, any> = {};
+  tagName: any;
+  style: any = {};
   constructor(tag: string) {
     this.tagName = tag;
   }
-  // @ts-ignore
   appendChild(child: any /*Element*/ | string) {
     this.children.push(child);
   }

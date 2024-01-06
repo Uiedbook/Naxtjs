@@ -13,10 +13,7 @@
     "url": "git+https://github.com/Uiedbook/Naxtjs.git"
   },
   "scripts": {
-    "build": "tsup src/index.ts && npm run cp:typedef",
-    "build:ts": "tsup src/index.ts",
-    "cp:typedef": "cp naxt.d.ts dist/index.d.ts",
-    "cp:types": "cp src/types.ts dist/types.ts"
+    "build": "tsup src/index.ts"
   },
   "keywords": [
     "javascript",
