@@ -1,5 +1,5 @@
 {
-  "name": "naxt",
+  "name": "naxtjs",
   "version": "1.0.0",
   "description": "Naxt - SSR library for server-side javascript ",
   "main": "dist/index.js",

@@ -44,7 +44,7 @@ Naxt follows the [VJS specification](https://github.com/Uiedbook/cradova/blob/ma
 ### npm
 
 ```bash
-npm i naxt
+npm i naxtjs
 ```
 
 ## Examples
@@ -54,7 +54,7 @@ Many aspects of Naxt are not reflected in the following example. More functional
 ## A basic component in Naxtjs:
 
 ```js
-import { div, h1, compile } from "naxt";
+import { div, h1, compile } from "naxtjs";
 
 function Hello(name) {
   return h1("Hello " + name, {
