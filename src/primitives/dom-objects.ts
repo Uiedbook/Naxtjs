@@ -1,10 +1,10 @@
-import { VJSType, VJS_params_TYPE, VJS_props_TYPE } from "../types";
+import { VJS_params_TYPE } from "../types";
 import { Rhoda } from "./functions";
 import { Element, naxt } from "./classes";
 
-export const makeElement = <E extends Element>(
-  element: E,
-  ElementChildrenAndPropertyList: VJS_params_TYPE<E>
+export const makeElement = (
+  element: any,
+  ElementChildrenAndPropertyList: VJS_params_TYPE
 ) => {
   let props: Record<string, any> | undefined = undefined,
     text: string | number | undefined = undefined;
@@ -90,9 +90,9 @@ export const makeElement = <E extends Element>(
 };
 
 export const cra = <E extends HTMLElement>(tag: string) => {
-  const extend = (...Children_and_Properties: VJSType<E>[]): E =>
-    makeElement<any>(new Element(tag), Children_and_Properties);
-  return extend as VJSType<E>;
+  const extend = (...Children_and_Properties: VJS_params_TYPE): E =>
+    makeElement(new Element(tag), Children_and_Properties);
+  return extend;
 };
 
 export const a = cra<HTMLAnchorElement>("a");
@@ -158,14 +158,7 @@ export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
 export const svg = (
   svg: string,
-  properties?: VJS_props_TYPE
+  ...properties: VJS_params_TYPE
 ): HTMLSpanElement => {
-  const span = new Element("span");
-  span.innerHTML = svg;
-  return makeElement<any>(span, [properties]) as HTMLSpanElement;
-};
-export const raw = (html: string): HTMLElement[] => {
-  const div = new Element("div");
-  div.innerHTML = html;
-  return Array.from(div.children) as HTMLElement[];
+  return span(svg, ...properties);
 };

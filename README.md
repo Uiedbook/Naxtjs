@@ -33,11 +33,19 @@
 
 ## What is Naxtjs?
 
-Naxt is a Cradova based framework for server side rendering.
+Naxt is a library framework for server side rendering.
 
-Naxt is an ultra fast, and performant, ssr framework for javascript and typescript in just 5KB.
+Naxt is fast, and performant and is just 5KB.
+
+Unlike htmx and qwirk, naxt only add 900 bytes of javascript to hydrate the dom and handle reactivity.
+
+This makes naxt very efficient.
 
 Naxt follows the [VJS specification](https://github.com/Uiedbook/cradova/blob/main/VJS_spec)
+
+Please naxt work exactly like htmx but this docs is not complete to demostrate it yet.
+
+If you want quick info check out our telegram group.
 
 ## Installation
 

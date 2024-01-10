@@ -1,4 +1,5 @@
-import { VJS_Child_TYPE } from "../types";
+import { randomBytes } from "node:crypto";
+import { VJS_params_TYPE } from "../types";
 import { naxt } from "./classes";
 import { readFile } from "node:fs/promises";
 
@@ -45,24 +46,17 @@ export function Rhoda(l: any[]) {
  * @param {function} elements[]
  */
 
-export function $if<Type>(
-  condition: boolean,
-  ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
-) {
+export function $if(condition: boolean, ...elements: VJS_params_TYPE) {
   if (condition) {
     return elements as HTMLElement[];
   }
   return undefined;
 }
 
-export function $ifelse<Type>(
+export function $ifelse(
   condition: boolean,
-  ifTrue:
-    | VJS_Child_TYPE<Type | HTMLElement>
-    | VJS_Child_TYPE<Type | HTMLElement>[],
-  ifFalse:
-    | VJS_Child_TYPE<Type | HTMLElement>
-    | VJS_Child_TYPE<Type | HTMLElement>[]
+  ifTrue: VJS_params_TYPE,
+  ifFalse: VJS_params_TYPE
 ) {
   if (condition) {
     return ifTrue;
@@ -70,10 +64,7 @@ export function $ifelse<Type>(
   return ifFalse;
 }
 
-export function $case<Type>(
-  value: any,
-  ...elements: VJS_Child_TYPE<Type | HTMLElement>[]
-) {
+export function $case(value: any, ...elements: VJS_params_TYPE) {
   return (key: any) => {
     if (key === value) {
       return elements as HTMLElement[];
@@ -98,7 +89,6 @@ export function $switch(
 }
 
 type LoopData<Type> = Type[];
-
 export function loop<Type>(
   datalist: LoopData<Type>,
   component: (
@@ -116,12 +106,19 @@ export function loop<Type>(
     ? (datalist.map(component) as unknown as HTMLElement[])
     : undefined;
 }
-const uuid = function () {
-  let t = Date.now ? +Date.now() : +new Date();
-  return "_xxxxx".replace(/[x]/g, function (e) {
-    const r = (t + 16 * Math.random()) % 16 | 0;
-    return (t = Math.floor(t / 16)), ("x" === e ? r : (7 & r) | 8).toString(16);
-  });
+const uuid = (): string => {
+  const PROCESS_UNIQUE = randomBytes(2);
+  let index = ~~(Math.random() * 0xffffff);
+  const inc = (index = (index + 1) % 0xffffff);
+  const buffer = Buffer.alloc(5);
+  // 3-byte counter
+  buffer[0] = inc & 0xff;
+  buffer[1] = (inc >> 8) & 0xff;
+  buffer[2] = (inc >> 16) & 0xff;
+  // 2-byte process unique
+  buffer[4] = PROCESS_UNIQUE[0];
+  buffer[3] = PROCESS_UNIQUE[1];
+  return "_" + buffer.toString("hex");
 };
 
 const joinStyles = (data: { [s: string]: unknown } | ArrayLike<unknown>) => {
@@ -138,15 +135,12 @@ const joinStyles = (data: { [s: string]: unknown } | ArrayLike<unknown>) => {
   }
   return props;
 };
-const joinProps = (
-  data: { [s: string]: unknown } | ArrayLike<unknown> = {}
-) => {
+const joinProps = (data: { [s: string]: unknown } = {}) => {
   let props = "";
   for (const [k, v] of Object.entries(data)) {
     if (v) {
       if (k === "style") {
         if (!Object.keys(v).length) {
-          // @ts-ignore
           data["style"] = undefined;
           continue;
         }
@@ -163,96 +157,86 @@ const joinProps = (
   return props;
 };
 
-function pile(dependency: Record<string, string> | false, element: any) {
+export function pile(
+  element: any,
+  dependency?: Record<string, string>,
+  s = true
+) {
   if (typeof element === "string") {
     return element;
   }
   let topLevel = false;
+  const initial_dependency = typeof dependency;
+  if (initial_dependency === "boolean") {
+    topLevel = true;
+  }
   if (!dependency) {
     dependency = {};
-    topLevel = true;
   }
   const children = [];
   let tagName = "div";
   let dom = "";
   //sanitize
   for (const key in element) {
-    // tag
+    //? tag
     if (key === "tagName") {
       tagName = element[key];
-      // @ts-ignore
-      element[key] = undefined;
       continue;
     }
-    // events
-    if (typeof element[key] === "function") {
-      if (!key.startsWith("on")) {
-        element[key].apply(element);
-        element[key] = undefined;
-      } else {
+    //? events
+    if (typeof element[key] === "function" && key.startsWith("on")) {
+      const code: string = element[key].toString();
+      const firstcidx = code.indexOf(")");
+      if (firstcidx !== -1) {
         const uid = uuid();
-        if (key === "onmount") {
-          dependency[uid] =
-            "function ()" + element[key].toString().split("()")[1];
-          element["data-mount-id"] = uid;
-          element[key] = undefined;
-        } else {
-          dependency[uid] =
-            "function ()" + element[key].toString().split("()")[1];
-          element[key] = "naxt.fns." + uid + ".bind(this)()";
-        }
+        dependency![uid] = "function ()" + code.slice(firstcidx + 1);
+        element[key] = "naxt.fns." + uid + ".apply(this)";
       }
-      // @ts-ignore
       continue;
     }
-    // children
+    //? children
     if (key == "children") {
-      children.push(...element.children.map(pile.bind(undefined, dependency)));
-      element[key] = undefined;
+      if (Array.isArray(element.children)) {
+        children.push(
+          ...element.children.map((ch: any) => pile(ch, dependency, false))
+        );
+      }
       continue;
     }
   }
-  // property
+  //? dom attributes
   dom = `<${tagName}${" " + joinProps(element)}>${children.join(
-    " "
+    ""
   )}</${tagName}>`;
   if (topLevel) {
     return [dom, dependency];
   }
+  if (s) {
+    const fn = uuid();
+    dom += `<script>const ${fn}=${JSON.stringify(
+      dependency
+    )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();</script>`;
+  }
+  //   dom += `
+  // <script>
+  // const ${fn} = ${JSON.stringify(dependency)};
+  // for (const k in ${fn}) {
+  //   window.naxt.fns[k] = new Function('return '+${fn}[k]+'')()
+  // }
+  // </script>`;
   return dom;
 }
 
 export async function compile(file: string, Naxt_Element_Tree: any) {
-  const HTML = pile(false, Naxt_Element_Tree);
-  // the naxt script
-  // TODO: adding reactivity via srrRef
-  //? comments
-  // hydration process = 1
-  // adding listeners = 2
-  // calling all onmount effects = 3
-  const naxt_script = `<script>
-  // 1
-  const naxt = {};
-  naxt.fns = ${JSON.stringify(HTML[1])}
-  // 2
-  for (const k in naxt.fns) {  
-    naxt.fns[k] = new Function('return '+naxt.fns[k]+'')()
-  }
-  // 3
-const mountListeners = document.querySelectorAll('[data-mount-id]')
-for (let i = 0; i < mountListeners.length; i++) {
-  const elem = mountListeners[i] 
-  naxt.fns[elem.getAttribute("data-mount-id")]() 
-  elem.removeAttribute("data-mount-id")
-} 
-</script>`;
+  const HTML = pile(Naxt_Element_Tree, false as any, false);
+  //? The naxt hydration script
+  const naxt_script = `<script>const naxt={};window.naxt=naxt,naxt.fns={},naxt.done=!1,naxt.fn=null,naxt.link={},naxt.update=async function(t,n){const a=await fetch(n),e=await a.text();e.includes("<")&&(t.innerHTML=e),naxt.hydrate()},naxt.onData=(t,n)=>{n?naxt.link[n]=t:"function"==typeof t&&(naxt.fn=t)},naxt.hydrate=async()=>{const t=document.querySelectorAll("[data-naxt-load]");for(let a=0;a<t.length;a++){const n=t[a],e=n.getAttribute("data-naxt-load");await naxt.update(n,e).then((()=>{n.removeAttribute("data-naxt-load"),naxt.link[e]&&naxt.link[e](),naxt.hydrate()}))}const n=document.querySelectorAll("[data-naxt-id]");for(let a=0;a<n.length;a++){const t=n[a];t.onclick=n=>{n.preventDefault(),naxt.update(document.getElementById(t.getAttribute("data-naxt-id")),t.href).then((()=>{naxt.hydrate(),naxt.link[t.href]&&naxt.link[t.href]()}))}}if(!naxt.done){const t=${JSON.stringify(
+    HTML[1]
+  )};for(const n in t)naxt.fns[n]=new Function("return "+t[n])();naxt.done=!0,naxt.fn&&naxt.fn()}},naxt.hydrate();</script>`;
   let html: string | undefined = undefined;
   try {
     html = await readFile(file, "utf-8");
-    html = html.replace(
-      "{mount}",
-      HTML[0] + (Object.keys(HTML[1]).length !== 0 ? "\n" + naxt_script : "")
-    );
+    html = html.replace("{mount}", HTML[0] + "\n" + naxt_script);
   } catch (error) {
     if (String(error).includes(".html")) {
       throw new Error("naxt err: " + file + " not found");

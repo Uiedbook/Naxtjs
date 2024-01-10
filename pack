@@ -18,6 +18,6 @@ echo ""
 npm run build
 echo  "${cyan} Packing ...${clear}"
 npm pack
-mv naxtjs-1.1.0.tgz ~
+mv naxtjs-1.1.1.tgz ~
 echo  "${green} done! ~${clear}"
 

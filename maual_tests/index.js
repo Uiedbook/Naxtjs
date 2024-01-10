@@ -1,54 +1,22 @@
-import { div, compile, p, h1, button, script, style } from "../dist/index.js";
+import { writeFileSync } from "node:fs";
+import { div, compile, h1, button, pile } from "../dist/index.js";
 
-const HTML = await compile(
-  "maual_tests/index.html",
-  div(
-    script('console.log("hello world")'),
-    style("body {color: green;}"),
-    button(
-      {
-        "data-num": "0",
-        onmount() {
-          console.log(this);
-        },
-        onclick() {
-          // this.style.color = "red";
-          // console.log("hello world people");
-          console.log(this);
-          // lol
-        },
+const HTML = div(
+  h1("Are we srr yet? yes", {
+    style: { backgroundColor: "grey", margin: "auto" },
+  }),
+  button(
+    {
+      "data-num": "0",
+      onclick() {
+        const idx = Number(this.getAttribute("data-num")) + 1;
+        this.innerText = "current count is " + idx;
+        this.setAttribute("data-num", idx);
       },
-      "click to test"
-    ),
-    h1("Are we srr yet? yes", { style: { "background-color": "aqua" } }),
-    // @ts-ignore
-    p({ style: { "background-color": "red" } }, "hello world")
+    },
+    "click to test"
   )
 );
+writeFileSync("test.html", await compile("maual_tests/index.html", HTML));
 
-const naxt_script = `<script>
-
-const naxt = {};
-
-naxt.fns = ${JSON.stringify(HTML[1])}
-
-// hydration
-
-// adding listeners 
-for (const k in naxt.fns) {  
-  naxt.fns[k] = new Function('return '+naxt.fns[k]+'')()
-}
-// calling all onmount effects
-const mountListeners = document.querySelectorAll('[data-mount-id]')
-for (let i = 0; i < mountListeners.length; i++) {
-  const elem = mountListeners[i] 
-  naxt.fns[elem.getAttribute("data-mount-id")]() 
-  elem.removeAttribute("data-mount-id")
-}
-// console.log(naxt.fns) 
-// console.log(mountListeners) 
-</script>`;
-
-// await serve({ HTML: HTML[0], dependencies: [naxt_script] });
-
-console.log(HTML);
+console.log(pile(HTML));

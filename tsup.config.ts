@@ -6,7 +6,7 @@ const config: Options = {
   clean: true,
   format: ["esm"],
   minify: true,
-  treeshake: "safest",
+  treeshake: "smallest",
   bundle: true,
   esbuildOptions(options) {
     options.legalComments = "none";
