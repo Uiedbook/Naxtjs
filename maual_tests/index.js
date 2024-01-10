@@ -5,6 +5,10 @@ const HTML = div(
   h1("Are we srr yet? yes", {
     style: { backgroundColor: "grey", margin: "auto" },
   }),
+  div({ "data-naxt-load": "/q" }),
+  div({ "data-naxt-load": "/b" }),
+  div({ "data-naxt-load": "/c" }),
+  div({ "data-naxt-load": "/d" }),
   button(
     {
       "data-num": "0",

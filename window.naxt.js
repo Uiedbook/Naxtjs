@@ -4,8 +4,6 @@ window.naxt = naxt;
 // ? naxt values
 naxt.fns = {};
 naxt.done = false;
-naxt.fn = null;
-naxt.link = {};
 // ? naxt methods
 naxt.update = async function (element, api) {
   const xhres = await fetch(api);
@@ -15,48 +13,36 @@ naxt.update = async function (element, api) {
   }
   naxt.hydrate();
 };
-naxt.onData = (fn, link) => {
-  if (link) {
-    naxt.link[link] = fn;
-    return;
-  }
-  if (typeof fn === "function") {
-    naxt.fn = fn;
-  }
-};
 naxt.hydrate = async () => {
   // load links
-  const lds = document.querySelectorAll("[data-naxt-load]");
-  for (let a = 0; a < lds.length; a++) {
-    const el = lds[a];
-    const link = el.getAttribute("data-naxt-load");
-    await naxt.update(el, link).then(() => {
+  const lds = Array.from(document.querySelectorAll("[data-naxt-load]"));
+  await Promise.all(
+    lds.map((el) => {
+      const link = el.getAttribute("data-naxt-load");
       el.removeAttribute("data-naxt-load");
-      if (naxt.link[link]) {
-        naxt.link[link]();
-      }
-      naxt.hydrate();
-    });
+      return naxt.update(el, link);
+    })
+  );
+  if (lds.length) {
+    await naxt.hydrate();
   }
   // handle click licks
-  const as = document.querySelectorAll("[data-naxt-id]");
-  for (let a = 0; a < as.length; a++) {
-    const ae = as[a];
-    ae.onclick = (e) => {
-      e.preventDefault();
-      naxt
-        .update(
-          document.getElementById(ae.getAttribute("data-naxt-id")),
-          ae.href
-        )
-        .then(() => {
-          naxt.hydrate();
-          if (naxt.link[ae.href]) {
-            naxt.link[ae.href]();
-          }
-        });
-    };
-  }
+  const as = Array.from(document.querySelectorAll("[data-naxt-id]"));
+  await Promise.all(
+    as.map(async (ae) => {
+      ae.onclick = (e) => {
+        e.preventDefault();
+        return naxt
+          .update(
+            document.getElementById(ae.getAttribute("data-naxt-id")),
+            ae.href
+          )
+          .then(() => {
+            naxt.hydrate();
+          });
+      };
+    })
+  );
   // call dom waiters
   if (!naxt.done) {
     const d = {}; //${JSON.stringify(HTML[1])}
@@ -64,7 +50,6 @@ naxt.hydrate = async () => {
       naxt.fns[k] = new Function("return " + d[k] + "")();
     }
     naxt.done = true;
-    naxt.fn && naxt.fn();
   }
 };
 naxt.hydrate();

@@ -177,10 +177,14 @@ export function pile(
   let tagName = "div";
   let dom = "";
   //sanitize
+  if (!element.tagName) {
+    throw new Error("elements can't be compile twince");
+  }
   for (const key in element) {
     //? tag
     if (key === "tagName") {
       tagName = element[key];
+      element[key] = undefined;
       continue;
     }
     //? events
@@ -201,9 +205,11 @@ export function pile(
           ...element.children.map((ch: any) => pile(ch, dependency, false))
         );
       }
+      element[key] = undefined;
       continue;
     }
   }
+
   //? dom attributes
   dom = `<${tagName}${" " + joinProps(element)}>${children.join(
     ""
@@ -230,9 +236,9 @@ export function pile(
 export async function compile(file: string, Naxt_Element_Tree: any) {
   const HTML = pile(Naxt_Element_Tree, false as any, false);
   //? The naxt hydration script
-  const naxt_script = `<script>const naxt={};window.naxt=naxt,naxt.fns={},naxt.done=!1,naxt.fn=null,naxt.link={},naxt.update=async function(t,n){const a=await fetch(n),e=await a.text();e.includes("<")&&(t.innerHTML=e),naxt.hydrate()},naxt.onData=(t,n)=>{n?naxt.link[n]=t:"function"==typeof t&&(naxt.fn=t)},naxt.hydrate=async()=>{const t=document.querySelectorAll("[data-naxt-load]");for(let a=0;a<t.length;a++){const n=t[a],e=n.getAttribute("data-naxt-load");await naxt.update(n,e).then((()=>{n.removeAttribute("data-naxt-load"),naxt.link[e]&&naxt.link[e](),naxt.hydrate()}))}const n=document.querySelectorAll("[data-naxt-id]");for(let a=0;a<n.length;a++){const t=n[a];t.onclick=n=>{n.preventDefault(),naxt.update(document.getElementById(t.getAttribute("data-naxt-id")),t.href).then((()=>{naxt.hydrate(),naxt.link[t.href]&&naxt.link[t.href]()}))}}if(!naxt.done){const t=${JSON.stringify(
+  const naxt_script = `<script>const naxt={};window.naxt=naxt,naxt.fns={},naxt.done=!1,naxt.update=async function(t,a){const n=await fetch(a),e=await n.text();e.includes("<")&&(t.innerHTML=e),naxt.hydrate()},naxt.hydrate=async()=>{const t=Array.from(document.querySelectorAll("[data-naxt-load]"));await Promise.all(t.map((t=>{const a=t.getAttribute("data-naxt-load");return t.removeAttribute("data-naxt-load"),naxt.update(t,a)}))),t.length&&await naxt.hydrate();const a=Array.from(document.querySelectorAll("[data-naxt-id]"));if(await Promise.all(a.map((async t=>{t.onclick=a=>(a.preventDefault(),naxt.update(document.getElementById(t.getAttribute("data-naxt-id")),t.href).then((()=>{naxt.hydrate()})))}))),!naxt.done){const t=${JSON.stringify(
     HTML[1]
-  )};for(const n in t)naxt.fns[n]=new Function("return "+t[n])();naxt.done=!0,naxt.fn&&naxt.fn()}},naxt.hydrate();</script>`;
+  )};for(const a in t)naxt.fns[a]=new Function("return "+t[a])();naxt.done=!0}},naxt.hydrate();</script>`;
   let html: string | undefined = undefined;
   try {
     html = await readFile(file, "utf-8");
