@@ -13,12 +13,19 @@ naxt.update = async function (element, api) {
   }
   naxt.hydrate();
 };
+naxt.refresh = (el) => {
+  if (el) {
+    const link = el.getAttribute("data-naxt-refresh-load");
+    return naxt.update(el, link);
+  }
+};
 naxt.hydrate = async () => {
   // load links
   const lds = Array.from(document.querySelectorAll("[data-naxt-load]"));
   await Promise.all(
     lds.map((el) => {
       const link = el.getAttribute("data-naxt-load");
+      el.setAttribute("data-naxt-refresh-load", link);
       el.removeAttribute("data-naxt-load");
       return naxt.update(el, link);
     })

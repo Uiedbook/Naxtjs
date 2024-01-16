@@ -1,4 +1,4 @@
-import { VJS_params_TYPE } from "../types";
+import { VJS_params_TYPE } from "./types";
 import { Rhoda } from "./functions";
 import { Element, naxt } from "./classes";
 

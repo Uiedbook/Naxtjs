@@ -1,13 +1,13 @@
 import { randomBytes } from "node:crypto";
-import { VJS_params_TYPE } from "../types";
-import { naxt } from "./classes";
+import { VJS_params_TYPE } from "./types";
+import { naxt, Element as E } from "./classes";
 import { readFile } from "node:fs/promises";
 
-export function Rhoda(l: any[]) {
-  const fg = naxt.createElement("div");
+export function Rhoda(l: any[]): any[] {
+  const fg = [];
   for (let ch of l) {
     if (Array.isArray(ch)) {
-      fg.appendChild(Rhoda(ch));
+      fg.push(Rhoda(ch));
     } else {
       if (ch?.render) {
         ch = ch.render() as any;
@@ -19,11 +19,11 @@ export function Rhoda(l: any[]) {
         }
       }
       if (typeof ch === "string" || typeof ch === "number") {
-        fg.appendChild(naxt.createTextNode(ch as string));
+        fg.push(naxt.createTextNode(ch as string));
         continue;
       }
-      if (ch instanceof Element) {
-        fg.appendChild(ch);
+      if (ch instanceof E) {
+        fg.push(ch);
       } else {
         if (typeof ch !== "undefined") {
           throw new Error(
@@ -236,9 +236,71 @@ export function pile(
 export async function compile(file: string, Naxt_Element_Tree: any) {
   const HTML = pile(Naxt_Element_Tree, false as any, false);
   //? The naxt hydration script
-  const naxt_script = `<script>const naxt={};window.naxt=naxt,naxt.fns={},naxt.done=!1,naxt.update=async function(t,a){const n=await fetch(a),e=await n.text();e.includes("<")&&(t.innerHTML=e),naxt.hydrate()},naxt.hydrate=async()=>{const t=Array.from(document.querySelectorAll("[data-naxt-load]"));await Promise.all(t.map((t=>{const a=t.getAttribute("data-naxt-load");return t.removeAttribute("data-naxt-load"),naxt.update(t,a)}))),t.length&&await naxt.hydrate();const a=Array.from(document.querySelectorAll("[data-naxt-id]"));if(await Promise.all(a.map((async t=>{t.onclick=a=>(a.preventDefault(),naxt.update(document.getElementById(t.getAttribute("data-naxt-id")),t.href).then((()=>{naxt.hydrate()})))}))),!naxt.done){const t=${JSON.stringify(
-    HTML[1]
-  )};for(const a in t)naxt.fns[a]=new Function("return "+t[a])();naxt.done=!0}},naxt.hydrate();</script>`;
+  const naxt_script = `<script>
+  // ? naxt object
+const naxt = {};
+window.naxt = naxt;
+// ? naxt values
+naxt.fns = {};
+naxt.done = false;
+// ? naxt methods
+naxt.update = async function (element, api) {
+  const xhres = await fetch(api);
+  const html = await xhres.text();
+  if (html.includes("<")) {
+    element.innerHTML = html;
+  }
+  naxt.hydrate();
+};
+naxt.refresh = (el) => {  
+    if (el) {
+      const link = el.getAttribute("data-naxt-refresh-load");
+      return naxt.update(el, link);
+    }
+};
+naxt.hydrate = async () => {
+  // load links
+  const lds = Array.from(document.querySelectorAll("[data-naxt-load]"));
+  await Promise.all(
+    lds.map((el) => {
+      const link = el.getAttribute("data-naxt-load");
+      el.setAttribute("data-naxt-refresh-load", link);
+      el.removeAttribute("data-naxt-load");
+      return naxt.update(el, link);
+    })
+  );
+  if (lds.length) {
+    await naxt.hydrate();
+  }
+  // handle click licks
+  const as = Array.from(document.querySelectorAll("[data-naxt-id]"));
+  await Promise.all(
+    as.map(async (ae) => {
+      ae.onclick = (e) => {
+        e.preventDefault();
+        return naxt
+          .update(
+            document.getElementById(ae.getAttribute("data-naxt-id")),
+            ae.href
+          )
+          .then(() => {
+            naxt.hydrate();
+          });
+      };
+    })
+  );
+  // call dom waiters
+  if (!naxt.done) {
+    const d =  ${JSON.stringify(HTML[1])};
+    for (const k in d) {
+      naxt.fns[k] = new Function("return " + d[k] + "")();
+    }
+    naxt.done = true;
+  }
+};
+naxt.hydrate();
+  </script>`;
+
   let html: string | undefined = undefined;
   try {
     html = await readFile(file, "utf-8");

@@ -6,6 +6,7 @@
   "type": "module",
   "files": [
     "dist/index.d.ts",
+    "dist/primitives",
     "dist/index.js"
   ],
   "repository": {
@@ -13,7 +14,7 @@
     "url": "git+https://github.com/Uiedbook/Naxtjs.git"
   },
   "scripts": {
-    "build": "tsup src/index.ts"
+    "build": "bun bundle.ts"
   },
   "keywords": [
     "javascript",
@@ -49,9 +50,7 @@
   },
   "homepage": "https://github.com/FridayCandour/naxt",
   "devDependencies": {
-    "@types/node": "^20.10.6",
-    "tsup": "^6.5.0",
-    "typescript": "^4.9.4"
+    "@types/node": "^20.10.6"
   },
   "dependencies": {
     "csstype": "^3.1.2"

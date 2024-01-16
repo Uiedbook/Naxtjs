@@ -9,6 +9,9 @@ export class Element {
   appendChild(child: any /*Element*/ | string) {
     this.children.push(child);
   }
+  append(child: (any /*Element*/ | string)[]) {
+    this.children.push(...child);
+  }
   setAttribute(key: string, value: any) {
     this[key] = value;
   }

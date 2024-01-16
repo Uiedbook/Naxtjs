@@ -16,20 +16,23 @@ export type VJS_params_TYPE =
     | Partial<AriaAttributes>
     | {
         src?: string;
-        href?: string;
-        placeholder?: string;
-        type?: string;
-        action?: string;
-        name?: string;
         alt?: string;
         for?: string;
-        method?: string;
+        rel?: string;
+        href?: string;
+        type?: string;
+        name?: string;
         rows?: string;
         value?: string;
+        accept: string;
+        action?: string;
         target?: string;
-        rel?: string;
+        method?: string;
+        checked?: boolean;
         required?: string;
         frameBorder?: string;
+        placeholder?: string;
+        autocomplete?: string;
         style?: CSS.Properties;
       }
   )[];
