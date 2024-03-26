@@ -162,8 +162,11 @@ export function pile(
   dependency?: Record<string, string>,
   s = true
 ) {
-  if (typeof element === "string") {
-    return element;
+  if (!element) {
+    throw new Error("invalid element!", element);
+  }
+  if (typeof element === "string" || typeof element === "number") {
+    return element as string;
   }
   let topLevel = false;
   const initial_dependency = typeof dependency;
@@ -178,7 +181,7 @@ export function pile(
   let dom = "";
   //sanitize
   if (!element.tagName) {
-    throw new Error("elements can't be compile twince");
+    throw new Error("elements can't be compile twice");
   }
   for (const key in element) {
     //? tag
