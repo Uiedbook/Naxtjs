@@ -197,7 +197,13 @@ export function pile(
       if (firstcidx !== -1) {
         const uid = uuid();
         dependency![uid] = "function ()" + code.slice(firstcidx + 1);
-        element[key] = "naxt.fns." + uid + ".apply(this)";
+        console.log("boohoo", { key, code, uid, firstcidx });
+        if (key === "onmount") {
+          element["data-naxt-activate"] = uid;
+          element[key] = undefined;
+        } else {
+          element[key] = "naxt.fns." + uid + ".apply(this)";
+        }
       }
       continue;
     }
@@ -224,7 +230,7 @@ export function pile(
     const fn = uuid();
     dom += `<script>const ${fn}=${JSON.stringify(
       dependency
-    )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();</script>`;
+    )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();document.querySelectorAll("[data-naxt-activate]").forEach((el) => {naxt.fns[el.getAttribute("data-naxt-activate")](el);});</script>`;
   }
   //   dom += `
   // <script>
@@ -298,6 +304,7 @@ naxt.hydrate = async () => {
     for (const k in d) {
       naxt.fns[k] = new Function("return " + d[k] + "")();
     }
+    document.querySelectorAll("[data-naxt-activate]").forEach((el) => {naxt.fns[el.getAttribute("data-naxt-activate")](el);});
     naxt.done = true;
   }
 };

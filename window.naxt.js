@@ -56,6 +56,9 @@ naxt.hydrate = async () => {
     for (const k in d) {
       naxt.fns[k] = new Function("return " + d[k] + "")();
     }
+    document.querySelectorAll("[data-naxt-activate]").forEach((el) => {
+      naxt.fns[el.getAttribute("data-naxt-activate")](el);
+    });
     naxt.done = true;
   }
 };

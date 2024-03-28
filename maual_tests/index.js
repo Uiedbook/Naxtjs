@@ -22,6 +22,9 @@ const HTML = () => {
         display: "flex",
         flexDirection: "column",
       },
+      onmount() {
+        alert("hurray!");
+      },
     },
     Orders(OrderData),
     h1("Are we srr yet? yes", {
@@ -92,5 +95,5 @@ const OrderData = [{ status: "success", amount: 200, name: "john" }];
 writeFileSync("test.html", await compile("maual_tests/index.html", HTML()));
 
 // console.log(pile(HTML()));
-console.log(pile(Orders(OrderData)));
-console.log(pile(Orders(OrderData)));
+// console.log(pile(Orders(OrderData)));
+// console.log(pile(Orders(OrderData)));
