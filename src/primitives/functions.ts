@@ -197,7 +197,6 @@ export function pile(
       if (firstcidx !== -1) {
         const uid = uuid();
         dependency![uid] = "function ()" + code.slice(firstcidx + 1);
-        console.log("boohoo", { key, code, uid, firstcidx });
         if (key === "onmount") {
           element["data-naxt-activate"] = uid;
           element[key] = undefined;
@@ -228,9 +227,9 @@ export function pile(
   }
   if (s) {
     const fn = uuid();
-    dom += `<script>const ${fn}=${JSON.stringify(
+    dom += `<!-- naxt-script-start --> \n <script>const ${fn}=${JSON.stringify(
       dependency
-    )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();document.querySelectorAll("[data-naxt-activate]").forEach((el) => {naxt.fns[el.getAttribute("data-naxt-activate")](el);});</script>`;
+    )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();document.querySelectorAll("[data-naxt-activate]").forEach((el) => {naxt.fns[el.getAttribute("data-naxt-activate")](el);});</script> \n <!-- naxt-script-end -->`;
   }
   //   dom += `
   // <script>
@@ -258,6 +257,16 @@ naxt.update = async function (element, api) {
   const html = await xhres.text();
   if (html.includes("<")) {
     element.innerHTML = html;
+    const tc = document.createElement("div");
+    tc.innerHTML = html;
+    const ses = tc.querySelectorAll("body script");
+    ses.forEach((se) => {
+      const jsCode = se.textContent?.trim();
+      const ns = document.createElement("script");
+      ns.textContent = jsCode || "";
+      document.body.appendChild(ns);
+      ns.remove();
+    });
   }
   naxt.hydrate();
 };

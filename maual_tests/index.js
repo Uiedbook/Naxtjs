@@ -13,6 +13,7 @@ import {
   th,
   tbody,
   span,
+  script,
 } from "../dist/index.js";
 
 const HTML = () => {
@@ -26,6 +27,9 @@ const HTML = () => {
         alert("hurray!");
       },
     },
+    script(`
+        alert("hurray friday!");
+    `),
     Orders(OrderData),
     h1("Are we srr yet? yes", {
       style: {

@@ -10,6 +10,16 @@ naxt.update = async function (element, api) {
   const html = await xhres.text();
   if (html.includes("<")) {
     element.innerHTML = html;
+    const tc = document.createElement("div");
+    tc.innerHTML = html;
+    const ses = tc.querySelectorAll("body script");
+    ses.forEach((se) => {
+      const jsCode = se.textContent?.trim();
+      const ns = document.createElement("script");
+      ns.textContent = jsCode || "";
+      document.body.appendChild(ns);
+      ns.remove();
+    });
   }
   naxt.hydrate();
 };

@@ -96,8 +96,7 @@ export const cra = <E extends HTMLElement>(tag: string) => {
 };
 
 export const a = cra<HTMLAnchorElement>("a");
-export const script = cra<HTMLAnchorElement>("script");
-export const style = cra<HTMLAnchorElement>("style");
+export const style = cra<HTMLStyleElement>("style");
 export const article = cra<HTMLElement>("article");
 export const audio = cra<HTMLAudioElement>("audio");
 export const br = cra<HTMLBRElement>("br");
@@ -156,6 +155,7 @@ export const track = cra<HTMLTrackElement>("track");
 export const u = cra<HTMLUListElement>("u");
 export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
+export const script = cra<HTMLScriptElement>("script");
 export const svg = (
   svg: string,
   ...properties: VJS_params_TYPE
