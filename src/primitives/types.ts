@@ -34,6 +34,6 @@ export type VJS_params_TYPE =
         placeholder?: string;
         autocomplete?: string;
         style?: CSS.Properties;
-        onmount?: (element: HTMLElement) => {};
+        onmount?: () => void;
       }
   )[];
