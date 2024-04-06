@@ -255,19 +255,21 @@ naxt.done = false;
 naxt.update = async function (element, api) {
   const xhres = await fetch(api);
   const html = await xhres.text();
-  console.log('naxt updating ...')
+  console.log('naxt updating boohoo 1...', html)
   if (html.includes("<")) {
     element.innerHTML = html;
-    
     const tc = document.createElement("div");
     tc.innerHTML = html;
     const ses = tc.querySelectorAll("body script");
+    console.log('naxt updating boohoo 2...', ses)
     ses.forEach((se) => {
+      console.log('naxt updating boohoo 3...', se)
       const jsCode = se.textContent?.trim();
+      console.log('naxt updating boohoo 4...', jsCode)
       const ns = document.createElement("script");
       ns.textContent = jsCode || "";
       document.body.appendChild(ns);
-      ns.remove();
+      // ns.remove();
     });
   }
   naxt.hydrate();
