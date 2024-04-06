@@ -254,14 +254,13 @@ naxt.done = false;
 // ? naxt methods
 naxt.update = async function (element, api) {
   const xhres = await fetch(api);
-  const html = await xhres.text();
-  console.log('naxt updating boohoo 1...', html)
+  const html = await xhres.text(); 
   if (html.includes("<")) {
     element.innerHTML = html;
     const tc = document.createElement("div");
     tc.innerHTML = html;
-    const ses = tc.querySelectorAll("body script");
-    console.log('naxt updating boohoo 2...', ses)
+    const ses = tc.querySelectorAll("script");
+    console.log('naxt updating boohoo 2...',{ ses, tc})
     ses.forEach((se) => {
       console.log('naxt updating boohoo 3...', se)
       const jsCode = se.textContent?.trim();
