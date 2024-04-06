@@ -201,7 +201,7 @@ export function pile(
           element["data-naxt-activate"] = uid;
           element[key] = undefined;
         } else {
-          element[key] = "naxt.fns." + uid + ".apply(this)";
+          element[key] = "naxt.fns." + uid + "()";
         }
       }
       continue;
