@@ -255,8 +255,10 @@ naxt.done = false;
 naxt.update = async function (element, api) {
   const xhres = await fetch(api);
   const html = await xhres.text();
+  console.log('naxt updating ...')
   if (html.includes("<")) {
     element.innerHTML = html;
+    
     const tc = document.createElement("div");
     tc.innerHTML = html;
     const ses = tc.querySelectorAll("body script");
