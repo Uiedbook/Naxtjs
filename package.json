@@ -1,6 +1,6 @@
 {
   "name": "naxtjs",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "Naxt - SSR library for server-side javascript ",
   "main": "dist/index.js",
   "type": "module",
