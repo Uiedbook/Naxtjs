@@ -260,15 +260,12 @@ naxt.update = async function (element, api) {
     const tc = document.createElement("div");
     tc.innerHTML = html;
     const ses = tc.querySelectorAll("script");
-    console.log('naxt updating boohoo 2...',{ ses, tc})
     ses.forEach((se) => {
-      console.log('naxt updating boohoo 3...', se)
       const jsCode = se.textContent?.trim();
-      console.log('naxt updating boohoo 4...', jsCode)
       const ns = document.createElement("script");
       ns.textContent = jsCode || "";
       document.body.appendChild(ns);
-      // ns.remove();
+      ns.remove();
     });
   }
   naxt.hydrate();
