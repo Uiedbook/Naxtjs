@@ -242,6 +242,9 @@ export function pile(
 }
 
 export async function compile(file: string, Naxt_Element_Tree: any) {
+  if (typeof file !== "string" || typeof Naxt_Element_Tree !== "function") {
+    throw new Error("Naxtjs: Invalid compile arguments!");
+  }
   const HTML = pile(Naxt_Element_Tree, false as any, false);
   //? The naxt hydration script
   const naxt_script = `<script>
@@ -322,7 +325,11 @@ naxt.hydrate();
 
   let html: string | undefined = undefined;
   try {
-    html = await readFile(file, "utf-8");
+    if (file.endsWith(".html")) {
+      html = await readFile(file, "utf-8");
+    } else {
+      html = file;
+    }
     html = html.replace("{mount}", HTML[0] + "\n" + naxt_script);
   } catch (error) {
     if (String(error).includes(".html")) {
