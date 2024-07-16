@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { VJS_params_TYPE } from "./types";
-import { naxtClass, Element as E } from "./classes";
+import { naxtClass, Element as E, Element } from "./classes";
 
 export function Rhoda(l: any[]): any[] {
   const fg = [];
@@ -137,11 +137,11 @@ function pile(
   dependency?: Record<string, string>,
   s: boolean = true
 ) {
-  if (!element) {
-    throw new Error("invalid element!", element);
-  }
   if (typeof element === "string" || typeof element === "number") {
     return element as string;
+  }
+  if (!(element instanceof Element)) {
+    return;
   }
   let topLevel = false;
   if (typeof dependency === "boolean") {
@@ -172,9 +172,12 @@ function pile(
         const uid = uuid();
         dependency![uid] = "function ()" + code.slice(firstcidx + 1);
         if (key === "onmount") {
+          // @ts-expect-error
           element["data-naxt-activate"] = uid;
+          // @ts-expect-error
           element[key] = undefined;
         } else {
+          // @ts-expect-error
           element[key] = "naxt.fns." + uid + ".apply(this)";
         }
       }
@@ -187,6 +190,7 @@ function pile(
           ...element.children.map((ch: any) => pile(ch, dependency, false))
         );
       }
+      // @ts-expect-error
       element[key] = undefined;
       continue;
     }
@@ -203,100 +207,11 @@ function pile(
   }
   if (s) {
     const fn = uuid();
-    dom += `<!-- naxt-script-start --> \n <script>const ${fn}=${JSON.stringify(
+    dom += `<!-- naxt-script-start --> \n <script>if (!window.naxt) {window.naxt = { fn: {} };} const ${fn}=${JSON.stringify(
       dependency
     )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();document.querySelectorAll("[data-naxt-activate]").forEach((el) => {window.naxt?.fns[el.getAttribute("data-naxt-activate")](el);});</script> \n <!-- naxt-script-end -->`;
   }
-  //   dom += `
-  // <script>
-  // const ${fn} = ${JSON.stringify(dependency)};
-  // for (const k in ${fn}) {
-  //   window.naxt.fns[k] = new Function('return '+${fn}[k]+'')()
-  // }
-  // </script>`;
   return dom;
 }
 
-export function compile(Naxt_Element_Tree: any) {
-  const HTML = pile(Naxt_Element_Tree, false as any, false);
-  //? The naxt hydration script
-  const naxt_script = `<script>
-  // ? naxt object
-  if(!window.naxt) { 
-  window.naxt = {};
-}
-// ? naxt values
-window.naxt.fns = {};
-window.naxt.done = false;
-// ? naxt methods
-window.naxt.update = async function (element, api) {
-  const xhres = await fetch(api);
-  const html = await xhres.text(); 
-  if (html.includes("<")) {
-    element.innerHTML = html;
-    const tc = document.createElement("div");
-    tc.innerHTML = html;
-    const ses = tc.querySelectorAll("script");
-    ses.forEach((se) => {
-      const jsCode = se.textContent?.trim();
-      const ns = document.createElement("script");
-      ns.textContent = jsCode || "";
-      document.body.appendChild(ns);
-      ns.remove();
-    });
-  }
-  window.naxt.hydrate();
-};
-window.naxt.refresh = (el) => {  
-    if (el) {
-      const link = el.getAttribute("data-naxt-refresh-load");
-      return window.naxt.update(el, link);
-    }
-};
-window.naxt.hydrate = async () => {
-  // load links
-  const lds = Array.from(document.querySelectorAll("[data-naxt-load]"));
-  await Promise.all(
-    lds.map((el) => {
-      const link = el.getAttribute("data-naxt-load");
-      el.setAttribute("data-naxt-refresh-load", link);
-      el.removeAttribute("data-naxt-load");
-      return window.naxt.update(el, link);
-    })
-  );
-  if (lds.length) {
-    await window.naxt.hydrate();
-  }
-  // handle click licks
-  const as = Array.from(document.querySelectorAll("[data-naxt-id]"));
-  await Promise.all(
-    as.map(async (ae) => {
-      ae.onclick = (e) => {
-        e.preventDefault();
-        return naxt
-          .update(
-            document.getElementById(ae.getAttribute("data-naxt-id")),
-            ae.href
-          )
-          .then(() => {
-            window.naxt.hydrate();
-          });
-      };
-    })
-  );
-  // call dom waiters
-  if (!window.naxt.done) {
-    const d =  ${JSON.stringify(HTML[1])};
-    for (const k in d) {
-      window.naxt.fns[k] = new Function("return " + d[k] + "")();
-    }
-    document.querySelectorAll("[data-naxt-activate]").forEach((el) => {window.naxt.fns[el.getAttribute("data-naxt-activate")](el);});
-    window.naxt.done = true;
-  }
-};
-window.naxt.hydrate();
-  </script>`;
-  return HTML[0] + "\n" + naxt_script;
-}
-
-export const naxt = { compile, pile };
+export const naxt = { pile };

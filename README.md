@@ -37,8 +37,6 @@ Naxtjs is a javascript lib for server rending html similar to htmx.
 
 But Naxtjs is rather light weight and simple. let see.
 
-Naxt only add <900 bytes of javascript to hydrate the dom and handle reactivity.
-
 Naxt follows the [VJS specification](https://github.com/Uiedbook/cradova/blob/main/VJS_spec)
 
 If you want support my telegram group (link below).
@@ -87,7 +85,11 @@ If no html comes, nothing happens.
 
 ```html
 <!-- Onclick -->
-<a data-naxt-id="main" href="/home.html">
+<a
+  data-naxt-event="main"
+  data-naxt-link="/home.html"
+  data-naxt-event-type="click"
+>
   <span class="title">Home</span>
 </a>
 ```

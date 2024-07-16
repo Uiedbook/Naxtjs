@@ -109,7 +109,7 @@ const writeH = async (file, HTML) => {
   return html;
 };
 
-writeFileSync("index.html", await writeH("templ.html", naxt.compile(HTML())));
+writeFileSync("index.html", await writeH("templ.html", naxt.pile(HTML())));
 
 console.log(naxt.pile(HTML()));
 console.log(naxt.pile(Orders(OrderData)));
