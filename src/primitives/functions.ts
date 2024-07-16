@@ -207,7 +207,7 @@ function pile(
   }
   if (s) {
     const fn = uuid();
-    dom += `<!-- naxt-script-start --> \n <script>if (!window.naxt) {window.naxt = { fn: {} };} const ${fn}=${JSON.stringify(
+    dom += `<!-- naxt-script-start --> \n <script>if (!window.naxt) {window.naxt = { fns: {} };} const ${fn}=${JSON.stringify(
       dependency
     )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();document.querySelectorAll("[data-naxt-activate]").forEach((el) => {window.naxt?.fns[el.getAttribute("data-naxt-activate")](el);});</script> \n <!-- naxt-script-end -->`;
   }
