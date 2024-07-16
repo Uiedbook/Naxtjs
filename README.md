@@ -33,19 +33,15 @@
 
 ## What is Naxtjs?
 
-Naxt is a library framework for server side rendering.
+Naxtjs is a javascript lib for server rending html similar to htmx.
 
-Naxt is fast, and performant and is just 5KB.
+But Naxtjs is rather light weight and simple. let see.
 
-Unlike htmx and qwirk, naxt only add 900 bytes of javascript to hydrate the dom and handle reactivity.
-
-This makes naxt very efficient.
+Naxt only add <900 bytes of javascript to hydrate the dom and handle reactivity.
 
 Naxt follows the [VJS specification](https://github.com/Uiedbook/cradova/blob/main/VJS_spec)
 
-Please naxt work exactly like htmx but this docs is not complete to demostrate it yet.
-
-If you want quick info check out our telegram group.
+If you want support my telegram group (link below).
 
 ## Installation
 
@@ -57,12 +53,10 @@ npm i naxtjs
 
 ## Examples
 
-Many aspects of Naxt are not reflected in the following example. More functionality will be entailed in future docs.
-
 ## A basic component in Naxtjs:
 
 ```js
-import { div, h1, compile } from "naxtjs";
+import { div, h1, naxt } from "naxtjs";
 
 function Hello(name) {
   return h1("Hello " + name, {
@@ -73,13 +67,84 @@ function Hello(name) {
   });
 }
 
-const html = await compile("index.html", div(Hello("peter"), Hello("joe"))); // html string
+const html = naxt.compile(div(Hello("peter"), Hello("joe"))); // html string
 
 app.get("/", (req, res) => {
   res.send(html);
 });
 ```
 
+## client usage
+
+```html
+<!-- Load -->
+<div data-naxt-load="/home.html"></div>
+```
+
+In the above code, Naxtjs will immediately replace the div with the html responces from the data-naxt-load attribute.
+
+If no html comes, nothing happens.
+
+```html
+<!-- Onclick -->
+<a data-naxt-id="main" href="/home.html">
+  <span class="title">Home</span>
+</a>
+```
+
+In ths above Naxtjs will replace the contents of the element with id "main" with the html responces from the href when the a tag is clicked.
+
+If no html comes, nothing happens.
+
+```js
+const updateMain = (type, key) => {
+  // ? params =   element, href
+  naxt.update(
+    document.getElementById("main"),
+    "/o/search/?type=" +
+      type +
+      "&q=" +
+      document.getElementById("search").value +
+      "&kq=" +
+      key
+  );
+};
+```
+
+In ths above function, Naxtjs will replace the contents of the element with the html responces from the href when the fucntion is called.
+
+If no html comes, nothing happens.
+
+## Server Usage
+
+```js
+export const LoginPage = (req, res) => {
+  const html = naxt.compile(
+    div(
+      img({
+        src: "./logo.png",
+        style: { maxWidth: "100px", margin: "4rem auto" },
+      }),
+      h1("Login"),
+      input({ placeholder: "email", id: "email" }),
+      input({ placeholder: "password", id: "password" }),
+      button("Login", {
+        id: "login",
+        style: {
+          color: "black",
+        },
+      })
+    )
+  );
+  res.send(html);
+};
+```
+
+There's a difference between naxt.compile and naxt.pile
+
+Both compiles javascript to html, but can only be used on the server, but only naxt.compile can load naxtjs to the dom.
+So if you are using naxt.pile on a page that has no naxtjs in the window yet, you will get errors
+
 ## Getting Help and Contributing
 
-To get further insights and help on Naxtjs, join [Telegram](https://t.me/uiedbookHQ) Community.
+To get help on Naxtjs, join [Telegram](https://t.me/uiedbookHQ) Community.

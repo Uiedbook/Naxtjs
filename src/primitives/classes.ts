@@ -23,13 +23,24 @@ export class Element {
   }
 }
 
-class naxtClass {
+class _naxtClass {
+  pool: Element[] = [];
   createElement(tag: string) {
+    if (this.pool.length) {
+      const el = this.pool.shift();
+      el!.children = [];
+      el!.style = {};
+      el!.tagName = tag;
+      return el;
+    }
     return new Element(tag);
   }
   createTextNode(Text: string) {
     return Text;
   }
+  saveToPool(ele: Element) {
+    this.pool.push(ele);
+  }
 }
 
-export const naxt = new naxtClass();
+export const naxtClass = new _naxtClass();

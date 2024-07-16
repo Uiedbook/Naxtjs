@@ -1,6 +1,6 @@
 import { VJS_params_TYPE } from "./types";
 import { Rhoda } from "./functions";
-import { Element, naxt } from "./classes";
+import { Element, naxtClass } from "./classes";
 
 export const makeElement = (
   element: any,
@@ -14,10 +14,7 @@ export const makeElement = (
       let child = ElementChildrenAndPropertyList[i] as any;
 
       if (typeof child === "function") {
-        child = child() as any;
-        if (typeof child === "function") {
-          child = child() as any;
-        }
+        child = child();
       }
       // appending child
       if (child instanceof Element) {
@@ -63,55 +60,33 @@ export const makeElement = (
         element.setAttribute(prop, value as string);
         continue;
       }
-
-      // aria-(s)
-      if (prop.includes("aria-")) {
-        element.setAttribute(prop, value as string);
-        continue;
-      }
-
-      // for compatibility
-      if (
-        typeof element.style[prop as unknown as number] !== "undefined" &&
-        prop !== "src"
-      ) {
-        element.style[prop as unknown as number] = value as string;
-        continue;
-      }
       // trying to set other values
       (element as unknown as Record<string, unknown>)[prop] = value;
       // event of error and it checking has been removed, because this happens at runtime
     }
   }
   if (text) {
-    element.appendChild(naxt.createTextNode(text as string));
+    element.appendChild(naxtClass.createTextNode(text as string));
   }
   return element;
 };
 
 export const cra = <E extends HTMLElement>(tag: string) => {
   const extend = (...Children_and_Properties: VJS_params_TYPE): E =>
-    makeElement(new Element(tag), Children_and_Properties);
+    makeElement(naxtClass.createElement(tag), Children_and_Properties);
   return extend;
 };
 
 export const a = cra<HTMLAnchorElement>("a");
-export const style = cra<HTMLStyleElement>("style");
-export const article = cra<HTMLElement>("article");
 export const audio = cra<HTMLAudioElement>("audio");
 export const br = cra<HTMLBRElement>("br");
 export const button = cra<HTMLButtonElement>("button");
 export const canvas = cra<HTMLCanvasElement>("canvas");
 export const caption = cra<HTMLTableCaptionElement>("caption");
-export const col = cra<HTMLTableColElement>("col");
-export const colgroup = cra<HTMLOptGroupElement>("colgroup");
 export const datalist = cra<HTMLDataListElement>("datalist");
 export const details = cra<HTMLDetailsElement>("details");
 export const dialog = cra<HTMLDialogElement>("dialog");
 export const div = cra<HTMLDivElement>("div");
-export const em = cra<HTMLElement>("em");
-export const embed = cra<HTMLEmbedElement>("embed");
-export const figure = cra<HTMLElement>("figure");
 export const footer = cra<HTMLElement>("footer");
 export const form = cra<HTMLFormElement>("form");
 export const h1 = cra<HTMLHeadingElement>("h1");
@@ -146,19 +121,35 @@ export const summary = cra<HTMLElement>("summary");
 export const table = cra<HTMLTableElement>("table");
 export const tbody = cra<HTMLTableColElement>("tbody");
 export const td = cra<HTMLTableCellElement>("td");
-export const template = cra<HTMLTemplateElement>("template");
 export const textarea = cra<HTMLTextAreaElement>("textarea");
 export const th = cra<HTMLTableSectionElement>("th");
 export const title = cra<HTMLTitleElement>("title");
 export const tr = cra<HTMLTableRowElement>("tr");
-export const track = cra<HTMLTrackElement>("track");
 export const u = cra<HTMLUListElement>("u");
 export const ul = cra<HTMLUListElement>("ul");
 export const video = cra<HTMLVideoElement>("video");
 export const script = cra<HTMLScriptElement>("script");
+// export const track = cra<HTMLTrackElement>("track");
+// export const figure = cra<HTMLElement>("figure");
+// export const article = cra<HTMLElement>("article");
+// export const col = cra<HTMLTableColElement>("col");
+// export const colgroup = cra<HTMLOptGroupElement>("colgroup");
+// export const em = cra<HTMLElement>("em");
+// export const embed = cra<HTMLEmbedElement>("embed");
 export const svg = (
   svg: string,
   ...properties: VJS_params_TYPE
 ): HTMLSpanElement => {
   return span(svg, ...properties);
+};
+
+export const raw = (
+  innerHTML: string | TemplateStringsArray
+): HTMLDivElement | void => {
+  if (Array.isArray(innerHTML)) {
+    innerHTML = innerHTML[0];
+  }
+  if (typeof innerHTML === "string") {
+    return div({ innerHTML });
+  }
 };

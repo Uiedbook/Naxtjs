@@ -14,7 +14,7 @@
     "url": "git+https://github.com/Uiedbook/Naxtjs.git"
   },
   "scripts": {
-    "build": "bun bundle.ts"
+    "compile": "bun bundle.ts"
   },
   "keywords": [
     "javascript",

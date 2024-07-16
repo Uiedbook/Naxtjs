@@ -1,19 +1,17 @@
 import { writeFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+
 import {
   div,
-  compile,
   h1,
   button,
-  pile,
-  p,
-  h3,
   table,
   td,
   tr,
   th,
   tbody,
   span,
-  script,
+  naxt,
 } from "../dist/index.js";
 
 const HTML = () => {
@@ -23,13 +21,7 @@ const HTML = () => {
         display: "flex",
         flexDirection: "column",
       },
-      onmount() {
-        alert("hurray!");
-      },
     },
-    script(`
-        alert("hurray friday!");
-    `),
     Orders(OrderData),
     h1("Are we srr yet? yes", {
       style: {
@@ -49,9 +41,10 @@ const HTML = () => {
       },
     }),
     div({ "data-naxt-load": "/q" }),
-    div({ "data-naxt-load": "/b" }),
-    div({ "data-naxt-load": "/c" }),
-    div({ "data-naxt-load": "/d" }),
+    div({ "data-naxt-load": "./index2.html" }),
+    // div({ "data-naxt-load": "./index2.html" }),
+    // div({ "data-naxt-load": "./index2.html" }),
+    // div({ "data-naxt-load": "./index2.html" }),
     button(
       {
         "data-num": "0",
@@ -96,8 +89,29 @@ const Orders = (data) => {
 };
 
 const OrderData = [{ status: "success", amount: 200, name: "john" }];
-writeFileSync("test.html", await compile("maual_tests/index.html", HTML()));
 
-// console.log(pile(HTML()));
-// console.log(pile(Orders(OrderData)));
-// console.log(pile(Orders(OrderData)));
+const writeH = async (file, HTML) => {
+  let html = undefined;
+  try {
+    if (file.endsWith(".html")) {
+      html = await readFile(file, "utf-8");
+    } else {
+      html = file;
+    }
+    html = html.replace("{mount}", HTML);
+  } catch (error) {
+    if (String(error).includes(".html")) {
+      throw new Error("naxt err: " + file + " not found");
+    } else {
+      throw new Error(String(error));
+    }
+  }
+  return html;
+};
+
+writeFileSync("index.html", await writeH("templ.html", naxt.compile(HTML())));
+
+console.log(naxt.pile(HTML()));
+console.log(naxt.pile(Orders(OrderData)));
+console.log(naxt.pile(Orders(OrderData)));
+writeFileSync("index2.html", naxt.pile(Orders(OrderData)));

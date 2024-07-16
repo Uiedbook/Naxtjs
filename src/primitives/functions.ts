@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { VJS_params_TYPE } from "./types";
-import { naxt, Element as E } from "./classes";
-import { readFile } from "node:fs/promises";
+import { naxtClass, Element as E } from "./classes";
 
 export function Rhoda(l: any[]): any[] {
   const fg = [];
@@ -9,31 +8,15 @@ export function Rhoda(l: any[]): any[] {
     if (Array.isArray(ch)) {
       fg.push(Rhoda(ch));
     } else {
-      if (ch?.render) {
-        ch = ch.render() as any;
-      }
       if (typeof ch === "function") {
         ch = ch();
-        if (typeof ch === "function") {
-          ch = ch();
-        }
       }
       if (typeof ch === "string" || typeof ch === "number") {
-        fg.push(naxt.createTextNode(ch as string));
+        fg.push(naxtClass.createTextNode(ch as string));
         continue;
       }
       if (ch instanceof E) {
         fg.push(ch);
-      } else {
-        if (typeof ch !== "undefined") {
-          throw new Error(
-            "  ✘  Cradova err:  invalid child type: " +
-              ch +
-              " (" +
-              typeof ch +
-              ")"
-          );
-        }
       }
     }
   }
@@ -46,49 +29,45 @@ export function Rhoda(l: any[]): any[] {
  * @param {function} elements[]
  */
 
-export function $if(condition: boolean, ...elements: VJS_params_TYPE) {
+export function $if<E>(condition: any, ...elements: VJS_params_TYPE<E>): any {
   if (condition) {
-    return elements as HTMLElement[];
+    return elements;
   }
-  return undefined;
 }
 
-export function $ifelse(
-  condition: boolean,
-  ifTrue: VJS_params_TYPE,
-  ifFalse: VJS_params_TYPE
-) {
+export function $ifelse(condition: any, ifTrue: any, ifFalse?: any) {
   if (condition) {
     return ifTrue;
   }
   return ifFalse;
 }
 
-export function $case(value: any, ...elements: VJS_params_TYPE) {
+export function $case<E = HTMLElement>(
+  value: any,
+  ...elements: VJS_params_TYPE<E>
+) {
   return (key: any) => {
     if (key === value) {
-      return elements as HTMLElement[];
+      return elements;
     }
     return undefined;
   };
 }
-export function $switch(
-  key: unknown,
-  ...cases: ((key: any) => HTMLElement[] | undefined)[]
-) {
+export function $switch(key: unknown, ...cases: ((key: any) => any)[]) {
+  let elements;
   if (cases.length) {
     for (let i = 0; i < cases.length; i++) {
-      const case_N = cases[i];
-      const elements = case_N(key);
+      elements = cases[i](key);
       if (elements) {
-        return elements;
+        break;
       }
     }
   }
-  return undefined;
+  return elements;
 }
 
 type LoopData<Type> = Type[];
+
 export function loop<Type>(
   datalist: LoopData<Type>,
   component: (
@@ -97,15 +76,11 @@ export function loop<Type>(
     array?: LoopData<Type>
   ) => HTMLElement | DocumentFragment | undefined
 ) {
-  if (typeof component !== "function") {
-    throw new Error(
-      " ✘  Cradova err :  Invalid component type, must be a function that returns html  "
-    );
-  }
   return Array.isArray(datalist)
     ? (datalist.map(component) as unknown as HTMLElement[])
     : undefined;
 }
+
 const uuid = (): string => {
   const PROCESS_UNIQUE = randomBytes(2);
   let index = ~~(Math.random() * 0xffffff);
@@ -157,10 +132,10 @@ const joinProps = (data: { [s: string]: unknown } = {}) => {
   return props;
 };
 
-export function pile(
+function pile(
   element: any,
   dependency?: Record<string, string>,
-  s = true
+  s: boolean = true
 ) {
   if (!element) {
     throw new Error("invalid element!", element);
@@ -169,8 +144,7 @@ export function pile(
     return element as string;
   }
   let topLevel = false;
-  const initial_dependency = typeof dependency;
-  if (initial_dependency === "boolean") {
+  if (typeof dependency === "boolean") {
     topLevel = true;
   }
   if (!dependency) {
@@ -222,14 +196,16 @@ export function pile(
   dom = `<${tagName}${" " + joinProps(element)}>${children.join(
     ""
   )}</${tagName}>`;
+  // ? put element back in pool
   if (topLevel) {
+    naxtClass.saveToPool(element);
     return [dom, dependency];
   }
   if (s) {
     const fn = uuid();
     dom += `<!-- naxt-script-start --> \n <script>const ${fn}=${JSON.stringify(
       dependency
-    )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();document.querySelectorAll("[data-naxt-activate]").forEach((el) => {naxt.fns[el.getAttribute("data-naxt-activate")](el);});</script> \n <!-- naxt-script-end -->`;
+    )};for(const n in ${fn})window.naxt.fns[n]=new Function("return "+${fn}[n])();document.querySelectorAll("[data-naxt-activate]").forEach((el) => {window.naxt?.fns[el.getAttribute("data-naxt-activate")](el);});</script> \n <!-- naxt-script-end -->`;
   }
   //   dom += `
   // <script>
@@ -241,21 +217,19 @@ export function pile(
   return dom;
 }
 
-export async function compile(file: string, Naxt_Element_Tree: any) {
-  if (typeof file !== "string" || typeof Naxt_Element_Tree !== "function") {
-    throw new Error("Naxtjs: Invalid compile arguments!");
-  }
+export function compile(Naxt_Element_Tree: any) {
   const HTML = pile(Naxt_Element_Tree, false as any, false);
   //? The naxt hydration script
   const naxt_script = `<script>
   // ? naxt object
-const naxt = {};
-window.naxt = naxt;
+  if(!window.naxt) { 
+  window.naxt = {};
+}
 // ? naxt values
-naxt.fns = {};
-naxt.done = false;
+window.naxt.fns = {};
+window.naxt.done = false;
 // ? naxt methods
-naxt.update = async function (element, api) {
+window.naxt.update = async function (element, api) {
   const xhres = await fetch(api);
   const html = await xhres.text(); 
   if (html.includes("<")) {
@@ -271,15 +245,15 @@ naxt.update = async function (element, api) {
       ns.remove();
     });
   }
-  naxt.hydrate();
+  window.naxt.hydrate();
 };
-naxt.refresh = (el) => {  
+window.naxt.refresh = (el) => {  
     if (el) {
       const link = el.getAttribute("data-naxt-refresh-load");
-      return naxt.update(el, link);
+      return window.naxt.update(el, link);
     }
 };
-naxt.hydrate = async () => {
+window.naxt.hydrate = async () => {
   // load links
   const lds = Array.from(document.querySelectorAll("[data-naxt-load]"));
   await Promise.all(
@@ -287,11 +261,11 @@ naxt.hydrate = async () => {
       const link = el.getAttribute("data-naxt-load");
       el.setAttribute("data-naxt-refresh-load", link);
       el.removeAttribute("data-naxt-load");
-      return naxt.update(el, link);
+      return window.naxt.update(el, link);
     })
   );
   if (lds.length) {
-    await naxt.hydrate();
+    await window.naxt.hydrate();
   }
   // handle click licks
   const as = Array.from(document.querySelectorAll("[data-naxt-id]"));
@@ -305,38 +279,24 @@ naxt.hydrate = async () => {
             ae.href
           )
           .then(() => {
-            naxt.hydrate();
+            window.naxt.hydrate();
           });
       };
     })
   );
   // call dom waiters
-  if (!naxt.done) {
+  if (!window.naxt.done) {
     const d =  ${JSON.stringify(HTML[1])};
     for (const k in d) {
-      naxt.fns[k] = new Function("return " + d[k] + "")();
+      window.naxt.fns[k] = new Function("return " + d[k] + "")();
     }
-    document.querySelectorAll("[data-naxt-activate]").forEach((el) => {naxt.fns[el.getAttribute("data-naxt-activate")](el);});
-    naxt.done = true;
+    document.querySelectorAll("[data-naxt-activate]").forEach((el) => {window.naxt.fns[el.getAttribute("data-naxt-activate")](el);});
+    window.naxt.done = true;
   }
 };
-naxt.hydrate();
+window.naxt.hydrate();
   </script>`;
-
-  let html: string | undefined = undefined;
-  try {
-    if (file.endsWith(".html")) {
-      html = await readFile(file, "utf-8");
-    } else {
-      html = file;
-    }
-    html = html.replace("{mount}", HTML[0] + "\n" + naxt_script);
-  } catch (error) {
-    if (String(error).includes(".html")) {
-      throw new Error("naxt err: " + file + " not found");
-    } else {
-      throw new Error(String(error));
-    }
-  }
-  return html;
+  return HTML[0] + "\n" + naxt_script;
 }
+
+export const naxt = { compile, pile };

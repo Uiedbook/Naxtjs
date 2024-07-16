@@ -1,39 +1,45 @@
 import * as CSS from "csstype";
 
 type DataAttributes = { [key: `data-${string}`]: string };
-type AriaAttributes = { [key: `aria-${string}`]: string };
 
-export type VJS_params_TYPE =
+type Attributes = {
+  src?: string;
+  alt?: string;
+  for?: string;
+  rel?: string;
+  href?: string;
+  type?: string;
+  name?: string;
+  rows?: string;
+  value?: string;
+  accept: string;
+  action?: string;
+  target?: string;
+  method?: string;
+  checked?: boolean;
+  required?: string;
+  frameBorder?: string;
+  placeholder?: string;
+  autocomplete?: string;
+  style?: CSS.Properties;
+  onmount?: (this: HTMLElement & Attributes) => void;
+};
+
+export type VJS_params_TYPE<E = HTMLElement> =
   // children type
   (
-    | undefined
     | string
+    | undefined
     | HTMLElement
     | HTMLElement[]
-    | Partial<HTMLElement>
+    // property type
+    | Attributes
     | (() => HTMLElement)
+    | Partial<Attributes>
+    | Partial<E>
+    | Record<string, (this: E) => void>
     | Partial<DataAttributes>
-    | Partial<AriaAttributes>
-    | {
-        src?: string;
-        alt?: string;
-        for?: string;
-        rel?: string;
-        href?: string;
-        type?: string;
-        name?: string;
-        rows?: string;
-        value?: string;
-        accept: string;
-        action?: string;
-        target?: string;
-        method?: string;
-        checked?: boolean;
-        required?: string;
-        frameBorder?: string;
-        placeholder?: string;
-        autocomplete?: string;
-        style?: CSS.Properties;
-        onmount?: () => void;
-      }
+    | CSS.Properties<string | number>
+    //
+    | Partial<HTMLElement>
   )[];
