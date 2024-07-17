@@ -117,6 +117,8 @@ In ths above function, Naxtjs will replace the contents of the element with the 
 
 If no html comes, nothing happens.
 
+See line 5 of dist/client.min.js to see how Naxtjs handles request headers for security measures when access content from servers
+
 ## Server Usage
 
 ```js
